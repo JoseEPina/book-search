@@ -22,18 +22,22 @@ const resolvers = {
    Mutation: {
       login: async (parent, { email, password }) => {
          const user = await User.findOne({ email });
+         console.log('file: resolvers.js ~ line 25 ~ user', user);
 
          if (!user) {
             throw new AuthenticationError('Cannot find this user.');
          }
 
          const correctPw = await user.isCorrectPassword(password);
+         console.log('file: resolvers.js ~ line 32 ~ correctPw', correctPw);
 
          if (!correctPw) {
             throw new AuthenticationError('Incorrect Password.');
          }
 
          const token = signToken(user);
+         console.log('file: resolvers.js ~ line 39 ~ user', user);
+         console.log('file: resolvers.js ~ line 40 ~ token', token);
          return { token, user };
       },
 
@@ -43,15 +47,18 @@ const resolvers = {
 
          return { token, user };
       },
-
+      // args
       saveBook: async (parent, { bookId }, context) => {
+         console.log('file: resolvers.js ~ line 48 ~ bookId', bookId);
+         console.log('file: resolvers.js ~ line 50 ~ context.user', context.user);
          if (context.user) {
             const updatedUser = await User.findOneAndUpdate(
                { _id: context.user._id },
-               { $addToSet: { savedBooks: bookId } },
+               { $push: { savedBooks: { bookId: bookId } } },
                { new: true }
-            ).populate('savedBooks');
+            );
 
+            console.log('file: resolvers.js ~ line 58 ~ updatedUser', updatedUser);
             return updatedUser;
          }
 
@@ -62,9 +69,9 @@ const resolvers = {
          if (context.user) {
             const updatedUser = await User.findOneAndUpdate(
                { _id: context.user._id },
-               { $pull: { savedBooks: bookId } },
+               { $pull: { savedBooks: { bookId: bookId } } },
                { new: true }
-            ).populate('savedBooks');
+            )
 
             return updatedUser;
          }
@@ -73,3 +80,5 @@ const resolvers = {
       },
    },
 };
+
+module.exports = resolvers;
