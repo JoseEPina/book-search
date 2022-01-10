@@ -36,7 +36,7 @@ const LoginForm = () => {
          console.log('file: index.js ~ line 36 ~ data', data);
 
          Auth.login(data.token);
-         console.log('file: index.js ~ line 39 ~ Auth.login(token)', Auth.login(data.login.token));
+         console.log('file: index.js ~ line 39 ~ Auth.login(token)', Auth.login(data.token));
       } catch (err) {
          console.log(err);
          console.error(err);

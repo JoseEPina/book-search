@@ -47,22 +47,25 @@ const resolvers = {
 
          return { token, user };
       },
-      // args
-      saveBook: async (parent, { bookId }, context) => {
-         console.log('file: resolvers.js ~ line 48 ~ bookId', bookId);
+
+      saveBook: async (parent, args, context) => {
+         console.log('file: resolvers.js ~ line 48 ~ args', args);
          console.log('file: resolvers.js ~ line 50 ~ context.user', context.user);
+         // Check if the context contains a user object
          if (context.user) {
+            // Push new books to users savedBooks array
             const updatedUser = await User.findOneAndUpdate(
                { _id: context.user._id },
-               { $push: { savedBooks: { bookId: bookId } } },
+               { $push: { savedBooks: args.input } },
                { new: true }
             );
-
             console.log('file: resolvers.js ~ line 58 ~ updatedUser', updatedUser);
+            // Return updatedUser
             return updatedUser;
          }
 
-         throw new AuthenticationError('You need to be logged in!');
+         // Throw error if user is not logged in
+         throw new AuthenticationError('Not logged in!');
       },
 
       removeBook: async (parent, { bookId }, context) => {
@@ -71,7 +74,7 @@ const resolvers = {
                { _id: context.user._id },
                { $pull: { savedBooks: { bookId: bookId } } },
                { new: true }
-            )
+            );
 
             return updatedUser;
          }
